@@ -6,6 +6,7 @@ use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\ParallelTesting;
 use Illuminate\Support\Facades\Request;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -38,5 +39,18 @@ class AppServiceProvider extends ServiceProvider
         ParallelTesting::setUpTestDatabase(function (string $database, int $token) {
             Artisan::call('db:seed');
         });
+
+        if ($this->app->environment('local')) {
+            // Force HTTPS in local environment for testing purposes
+            URL::forceScheme('https');
+        } elseif ($this->app->environment('production')) {
+            // Force HTTPS in production environment
+            URL::forceScheme('https');
+        } else {
+            // For other environments, you can choose to force HTTP or not
+            // Uncomment the line below if you want to force HTTP in non-production environments
+            //
+            // \URL::forceScheme('http');
+    }
     }
 }
